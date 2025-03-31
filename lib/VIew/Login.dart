@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../controller/Firebase_Controller.dart';
+
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -72,8 +74,29 @@ class _LoginState extends State<Login> {
               ),
               SizedBox(height: 10),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, "/home");
+                onPressed: () async {
+                  if (email.text.trim().isEmpty ||
+                      password.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "Enter Email Or Password",
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  } else {
+                    final lc = Firebase_Controller();
+                    if (await lc.signIn(
+                      email.text.trim().toString(),
+                      password.text.trim().toString(),
+                    )) {
+                      Navigator.pushReplacementNamed(context, "/home");
+                    } else {
+                      print("Not Navigate");
+                    }
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,

@@ -1,3 +1,6 @@
+import 'package:email_validator/email_validator.dart';
+import 'package:expense_tracker/controller/Firebase_Controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {
@@ -14,6 +17,7 @@ class _SignUpState extends State<SignUp> {
   var password = TextEditingController();
   var cpassword = TextEditingController();
   bool _isChecked = false;
+  bool _isshow = true;
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +87,7 @@ class _SignUpState extends State<SignUp> {
                   controller: mobile,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   keyboardType: TextInputType.number,
+                  maxLength: 10,
                   decoration: InputDecoration(
                     hintText: "Enter Mobile No.",
                     hintStyle: TextStyle(
@@ -127,9 +132,18 @@ class _SignUpState extends State<SignUp> {
                   controller: password,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   keyboardType: TextInputType.text,
-                  obscureText: true,
+                  obscureText: _isshow,
                   obscuringCharacter: "*",
+
                   decoration: InputDecoration(
+                    prefixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isshow = !_isshow;
+                        });
+                      },
+                      icon: Icon(Icons.remove_red_eye),
+                    ),
                     hintText: "Enter Password",
                     hintStyle: TextStyle(
                       fontSize: 22,
@@ -151,10 +165,19 @@ class _SignUpState extends State<SignUp> {
                   controller: cpassword,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   keyboardType: TextInputType.text,
-                  obscureText: true,
+                  obscureText: _isshow,
                   obscuringCharacter: "*",
                   decoration: InputDecoration(
                     hintText: "Enter Confirm Password",
+                    prefixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _isshow = !_isshow;
+                        });
+                      },
+                      icon: Icon(Icons.remove_red_eye),
+                    ),
+
                     hintStyle: TextStyle(
                       fontSize: 22,
                       color: Colors.white,
@@ -205,7 +228,54 @@ class _SignUpState extends State<SignUp> {
                       child: SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            if (password.text.toString() ==
+                                    cpassword.text.toString() &&
+                                EmailValidator.validate(
+                                  email.text.trim().toString(),
+                                )) {
+                              Firebase_Controller.addUser(
+                                {
+                                  "Name": name.text.trim().toString(),
+                                  "MobileNo": mobile.text.trim().toString(),
+                                  "email": email.text.trim().toString(),
+                                  "password": password.text.trim().toString(),
+                                  "Uid": FirebaseAuth.instance.currentUser?.uid,
+                                },
+                                "User",
+                                FirebaseAuth.instance.currentUser!.uid,
+                              ).then((e) {
+                                Firebase_Controller.signUp(
+                                  email.text.toString(),
+                                  password.text.toString(),
+                                );
+                                name.clear();
+                                mobile.clear();
+                                email.clear();
+                                password.clear();
+                                cpassword.clear();
+
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Signup Successfully",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              });
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Enter Email Or Password Correctly",
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             shape: RoundedRectangleBorder(
