@@ -1,3 +1,5 @@
+import org.gradle.api.JavaVersion.VERSION_11
+
 plugins {
     id("com.android.application")
     // START: FlutterFire Configuration
@@ -10,12 +12,12 @@ plugins {
 
 android {
     namespace = "com.example.expense_tracker"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = "28.0.13004108"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = VERSION_11
+        targetCompatibility = VERSION_11
     }
 
     kotlinOptions {
@@ -40,6 +42,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    buildToolsVersion = "34.0.0"
 }
 
 flutter {

@@ -292,7 +292,7 @@ class _SignUpState extends State<SignUp> {
                         ),
                       ),
                     )
-                    : Container(
+                    : SizedBox(
                       height: MediaQuery.of(context).size.height * 0.05,
                       child: Text(
                         "Agree The Terms And Conditions",

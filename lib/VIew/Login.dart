@@ -37,6 +37,7 @@ class _LoginState extends State<Login> {
                     fontSize: 22,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
+                    
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.only(

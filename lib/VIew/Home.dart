@@ -18,7 +18,7 @@ class _HomeState extends State<Home> {
   String date = DateFormat('dd-MM-yyyy').format(DateTime.now());
   String time = DateFormat('HH:mm:ss').format(DateTime.now());
 
-  Future<void> adddata() async {
+  Future<void> addData() async {
     final Map<String, dynamic> data = {
       "Category": selectedCategory.toString(),
       "SubCategory": selectedSubCategory.toString(),
