@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'VIew/Login.dart';
+import 'VIew/show_list.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         "/tnc": (context) => TermsAndConditions(),
         "/login": (context) => Login(),
         "/home": (context) => Home(),
+        "/expenseList": (context) => ExpenseListScreen(),
       },
     );
   }

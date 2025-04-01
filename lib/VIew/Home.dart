@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../controller/Firebase_Controller.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -22,9 +25,13 @@ class _HomeState extends State<Home> {
     final Map<String, dynamic> data = {
       "Category": selectedCategory.toString(),
       "SubCategory": selectedSubCategory.toString(),
-      "Date": date,
-      "Time": time,
+      "SellerName": sellername,
+      "Amount": Amount,
+      "Date": DateFormat('dd-MM-yyyy').format(DateTime.now()),
+      "Time": DateFormat('HH:mm:ss').format(DateTime.now()),
+      "Uid": FirebaseAuth.instance.currentUser?.uid,
     };
+    await Firebase_Controller.addData(data, "ytt6");
     print(data);
   }
 
@@ -104,14 +111,6 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-                ListTile(
-                  leading: Icon(Icons.pie_chart),
-                  title: Text("Show Expense Chart"),
-                  onTap: () {
-                    Navigator.pushNamed(context, '/expenseChart');
-                  },
-                ),
-                SizedBox(height: 8),
                 ListTile(
                   leading: Icon(Icons.list),
                   title: Text("Show Expense List"),
@@ -279,12 +278,12 @@ class _HomeState extends State<Home> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Category: ${selectedCategory ?? "None"}",
+                    "Category: ${selectedCategory ?? " "}",
                     style: TextStyle(fontSize: 22, color: Colors.white),
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Sub-Category: ${selectedSubCategory ?? "None"}",
+                    "Sub-Category: ${selectedSubCategory ?? " "}",
                     style: TextStyle(fontSize: 22, color: Colors.white),
                   ),
                   SizedBox(height: 10),
@@ -301,7 +300,12 @@ class _HomeState extends State<Home> {
 
                   ElevatedButton(
                     onPressed: () {
-                      setState(() {});
+                      addData().then((e) {
+                        setState(() {
+                          seller.clear();
+                          amount.clear();
+                        });
+                      });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.indigo,
