@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/Model/expenseChart.dart';
+import 'package:expense_tracker/VIew/Show_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -39,19 +40,28 @@ class _ExpenseListScreenState extends State<ExpenseListScreen> {
             totalAmount += double.parse(expense.Amount);
           }
 
-          return ListView.builder(
-            itemCount: expenses.length,
-            itemBuilder: (context, index) {
-              final expense = expenses[index];
-              return ListTile(
-                title: Text(expense.SellerName),
-                subtitle: Text('${expense.Amount} - ${expense.Category}'),
-                trailing: Text(expense.Date),
-                onTap: () {
-                  // Handle tap if needed
-                },
-              );
-            },
+          return Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                  itemCount: expenses.length,
+                  itemBuilder: (context, index) {
+                    final expense = expenses[index];
+                    return ListTile(
+                      title: Text(expense.SellerName),
+                      subtitle: Text('${expense.Amount} - ${expense.Category}'),
+                      trailing: Text(expense.Date),
+                      onTap: () {
+                        // Handle tap if needed
+                      },
+                    );
+                  },
+                ),
+              ),
+              ElevatedButton(onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ShowChart()));
+              }, child: Text("Show Chart"))
+            ],
           );
         },
       ),

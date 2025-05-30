@@ -1,4 +1,5 @@
 import 'package:expense_tracker/VIew/Home.dart';
+import 'package:expense_tracker/VIew/Show_chart.dart';
 import 'package:expense_tracker/VIew/Signup.dart';
 import 'package:expense_tracker/VIew/Tearm&Conditions.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
@@ -38,6 +39,7 @@ class MyApp extends StatelessWidget {
         "/login": (context) => Login(),
         "/home": (context) => Home(),
         "/expenseList": (context) => ExpenseListScreen(),
+        "/expenseChart":(context)=>ShowChart()
       },
     );
   }

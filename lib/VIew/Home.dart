@@ -122,6 +122,16 @@ class _HomeState extends State<Home> {
 
                 Divider(),
                 ListTile(
+                  leading: Icon(Icons.pie_chart),
+                  title: Text("Show Expense Chart"),
+                  onTap: () {
+                    Navigator.pushNamed(context, '/expenseChart');
+                  },
+                ),
+                SizedBox(height: 8),
+
+                Divider(),
+                ListTile(
                   leading: Icon(Icons.info),
                   title: Text("About"),
                   onTap: () {

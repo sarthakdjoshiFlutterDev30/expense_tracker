@@ -28,7 +28,7 @@ class expense {
     return expense(
       id: snapshot.id,
       Uid: data['Uid'] ?? "",
-      Amount: data['Amount'] ?? "",
+      Amount: data['Amount'] ?? "0",
       Category: data['Category'] ?? "",
       SubCategory: data['SubCategory'] ?? "",
       Date: data['Date'] ?? "",

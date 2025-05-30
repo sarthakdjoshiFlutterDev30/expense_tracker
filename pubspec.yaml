@@ -41,7 +41,7 @@ dependencies:
   fluttertoast: ^8.2.12
   firebase_app_check: ^0.3.2+4
   email_validator: ^3.0.0
-  fl_chart: ^0.70.2
+  fl_chart: ^1.0.0
 
 dev_dependencies:
   flutter_test:
