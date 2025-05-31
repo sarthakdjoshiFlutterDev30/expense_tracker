@@ -2,12 +2,13 @@ import 'package:expense_tracker/VIew/Home.dart';
 import 'package:expense_tracker/VIew/Show_chart.dart';
 import 'package:expense_tracker/VIew/Signup.dart';
 import 'package:expense_tracker/VIew/Tearm&Conditions.dart';
+import 'package:expense_tracker/VIew/splash.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import 'VIew/ExpenseList.dart';
 import 'VIew/Login.dart';
-import 'VIew/show_list.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -32,14 +33,15 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      initialRoute: "/login",
+      initialRoute: "/splash",
       routes: {
+        "/splash": (context) => Splash(),
         "/signup": (context) => SignUp(),
         "/tnc": (context) => TermsAndConditions(),
         "/login": (context) => Login(),
         "/home": (context) => Home(),
         "/expenseList": (context) => ExpenseListScreen(),
-        "/expenseChart":(context)=>ShowChart()
+        "/expenseChart": (context) => ShowChart(),
       },
     );
   }

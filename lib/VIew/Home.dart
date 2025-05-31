@@ -16,6 +16,7 @@ class _HomeState extends State<Home> {
   String? selectedSubCategory;
   var amount = TextEditingController();
   var seller = TextEditingController();
+  var inCome = TextEditingController();
   String sellername = "";
   String Amount = "";
   String date = DateFormat('dd-MM-yyyy').format(DateTime.now());
@@ -31,7 +32,7 @@ class _HomeState extends State<Home> {
       "Time": DateFormat('HH:mm:ss').format(DateTime.now()),
       "Uid": FirebaseAuth.instance.currentUser?.uid,
     };
-    await Firebase_Controller.addData(data, "ytt6");
+    await Firebase_Controller.addData(data, "Expense");
     print(data);
   }
 
@@ -130,6 +131,16 @@ class _HomeState extends State<Home> {
                 ),
                 SizedBox(height: 8),
 
+                ListTile(
+                  leading: Icon(Icons.logout_rounded),
+                  title: Text("Logout"),
+                  onTap: () {
+                    Firebase_Controller.signOut();
+                    Navigator.pushReplacementNamed(context, "/login");
+                  },
+                ),
+                SizedBox(height: 8),
+
                 Divider(),
                 ListTile(
                   leading: Icon(Icons.info),
@@ -159,7 +170,6 @@ class _HomeState extends State<Home> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  // Category Dropdown
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
                     decoration: BoxDecoration(
@@ -248,7 +258,6 @@ class _HomeState extends State<Home> {
                   ),
                   SizedBox(height: 20),
 
-                  // Amount TextField
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
                     decoration: BoxDecoration(
@@ -310,12 +319,44 @@ class _HomeState extends State<Home> {
 
                   ElevatedButton(
                     onPressed: () {
-                      addData().then((e) {
-                        setState(() {
-                          seller.clear();
-                          amount.clear();
+                      if (seller.text.trim().toString().isEmpty ||
+                          amount.text.trim().toString().isEmpty ||
+                          selectedCategory == null ||
+                          selectedSubCategory == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Enter All Details",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        );
+                      } else {
+                        addData().then((e) {
+                          setState(() {
+                            seller.clear();
+                            amount.clear();
+                            selectedCategory = null;
+                            selectedSubCategory = null;
+                            sellername = "";
+                            Amount = "";
+                            date = DateFormat(
+                              'dd-MM-yyyy',
+                            ).format(DateTime.now());
+                            time = DateFormat(
+                              'HH:mm:ss',
+                            ).format(DateTime.now());
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Expense Added Successfully",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                            );
+                          });
                         });
-                      });
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.indigo,

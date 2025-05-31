@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User_Model {
   final String id;
-  final String Uid;
   final String email;
   final String password;
   final String Name;
@@ -10,7 +9,6 @@ class User_Model {
 
   User_Model({
     required this.id,
-    required this.Uid,
     required this.MobileNo,
     required this.Name,
     required this.email,
@@ -23,7 +21,6 @@ class User_Model {
     final data = snapshot.data()!;
     return User_Model(
       id: snapshot.id,
-      Uid: data['Uid'] ?? "",
       email: data['email'] ?? "",
       MobileNo: data['MobileNo'] ?? "",
       password: data['password'] ?? "",

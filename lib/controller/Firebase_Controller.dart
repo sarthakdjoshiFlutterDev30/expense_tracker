@@ -14,9 +14,8 @@ class Firebase_Controller {
   static Future<void> addUser(
     Map<String, dynamic> data,
     String collection,
-    String uid,
   ) async {
-    await FirebaseFirestore.instance.collection(collection).doc(uid).set(data);
+    await FirebaseFirestore.instance.collection(collection).add(data);
   }
 
   static Future<void> signUp(String email, String password) async {
@@ -63,5 +62,17 @@ class Firebase_Controller {
       );
       return false;
     }
+  }
+
+  static Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  static Future<void> resetPassword(String email) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+  }
+
+  static bool rememberUser() {
+    return FirebaseAuth.instance.currentUser != null;
   }
 }

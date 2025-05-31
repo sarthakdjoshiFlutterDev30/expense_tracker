@@ -1,6 +1,6 @@
+import 'package:country_phone_validator/country_phone_validator.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:expense_tracker/controller/Firebase_Controller.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignUp extends StatefulWidget {
@@ -15,9 +15,15 @@ class _SignUpState extends State<SignUp> {
   var mobile = TextEditingController();
   var email = TextEditingController();
   var password = TextEditingController();
-  var cpassword = TextEditingController();
+  var cPassword = TextEditingController();
   bool _isChecked = false;
-  bool _isshow = true;
+  bool _isShow = true;
+  bool __isMatch = true;
+  bool _isLoading = true;
+
+  bool match(String pass, String cPass) {
+    return pass == cPass;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,14 +138,22 @@ class _SignUpState extends State<SignUp> {
                   controller: password,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   keyboardType: TextInputType.text,
-                  obscureText: _isshow,
+                  obscureText: _isShow,
                   obscuringCharacter: "*",
+                  onChanged: (_) {
+                    setState(() {
+                      __isMatch = match(
+                        password.text.trim(),
+                        cPassword.text.trim(),
+                      );
+                    });
+                  },
 
                   decoration: InputDecoration(
                     prefixIcon: IconButton(
                       onPressed: () {
                         setState(() {
-                          _isshow = !_isshow;
+                          _isShow = !_isShow;
                         });
                       },
                       icon: Icon(Icons.remove_red_eye),
@@ -162,17 +176,25 @@ class _SignUpState extends State<SignUp> {
                 ),
                 SizedBox(height: 10),
                 TextField(
-                  controller: cpassword,
+                  controller: cPassword,
                   style: const TextStyle(fontSize: 20, color: Colors.white),
                   keyboardType: TextInputType.text,
-                  obscureText: _isshow,
+                  onChanged: (_) {
+                    setState(() {
+                      __isMatch = match(
+                        password.text.trim(),
+                        cPassword.text.trim(),
+                      );
+                    });
+                  },
+                  obscureText: _isShow,
                   obscuringCharacter: "*",
                   decoration: InputDecoration(
                     hintText: "Enter Confirm Password",
                     prefixIcon: IconButton(
                       onPressed: () {
                         setState(() {
-                          _isshow = !_isshow;
+                          _isShow = !_isShow;
                         });
                       },
                       icon: Icon(Icons.remove_red_eye),
@@ -194,6 +216,23 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 SizedBox(height: 10),
+                (__isMatch)
+                    ? Text(
+                      "Password and Confirm Password Match",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                    : Text(
+                      "Password and Confirm Password Not Match",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                 Row(
                   children: [
                     Checkbox.adaptive(
@@ -225,72 +264,88 @@ class _SignUpState extends State<SignUp> {
                 (_isChecked)
                     ? Visibility(
                       visible: _isChecked,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (password.text.toString() ==
-                                    cpassword.text.toString() &&
-                                EmailValidator.validate(
-                                  email.text.trim().toString(),
-                                )) {
-                              Firebase_Controller.addUser(
-                                {
-                                  "Name": name.text.trim().toString(),
-                                  "MobileNo": mobile.text.trim().toString(),
-                                  "email": email.text.trim().toString(),
-                                  "password": password.text.trim().toString(),
-                                  "Uid": FirebaseAuth.instance.currentUser?.uid,
-                                },
-                                "User",
-                                FirebaseAuth.instance.currentUser!.uid,
-                              ).then((e) {
-                                Firebase_Controller.signUp(
-                                  email.text.toString(),
-                                  password.text.toString(),
-                                );
-                                name.clear();
-                                mobile.clear();
-                                email.clear();
-                                password.clear();
-                                cpassword.clear();
+                      child:
+                          (_isLoading)
+                              ? SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (password.text.toString() ==
+                                            cPassword.text.toString() &&
+                                        EmailValidator.validate(
+                                          email.text.trim().toString(),
+                                        ) &&
+                                        CountryUtils.validatePhoneNumber(
+                                          mobile.text.trim().toString(),
+                                          "+91",
+                                        )) {
+                                      setState(() {
+                                        _isLoading = false;
+                                      });
+                                      Firebase_Controller.addUser({
+                                        "Name": name.text.trim().toString(),
+                                        "MobileNo":
+                                            mobile.text.trim().toString(),
+                                        "email": email.text.trim().toString(),
+                                        "password":
+                                            password.text.trim().toString(),
+                                      }, "User").then((e) {
+                                        Firebase_Controller.signUp(
+                                          email.text.toString(),
+                                          password.text.toString(),
+                                        );
+                                        name.clear();
+                                        mobile.clear();
+                                        email.clear();
+                                        password.clear();
+                                        cPassword.clear();
+                                        Navigator.pushNamed(context, "/login");
 
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      "Signup Successfully",
-                                      style: TextStyle(fontSize: 20),
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Signup Successfully",
+                                              style: TextStyle(fontSize: 20),
+                                            ),
+                                            duration: Duration(seconds: 2),
+                                          ),
+                                        );
+                                      });
+                                    } else {
+                                      setState(() {
+                                        _isLoading = true;
+                                      });
+
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            "Enter Email Or Password Correctly Or Enter Valid Phone Number",
+                                            style: TextStyle(fontSize: 20),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.zero,
                                     ),
-                                    duration: Duration(seconds: 2),
                                   ),
-                                );
-                              });
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Enter Email Or Password Correctly",
-                                    style: TextStyle(fontSize: 20),
+                                  child: Text(
+                                    "Signup",
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.zero,
-                            ),
-                          ),
-                          child: Text(
-                            "Signup",
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
+                              )
+                              : CircularProgressIndicator(),
                     )
                     : SizedBox(
                       height: MediaQuery.of(context).size.height * 0.05,

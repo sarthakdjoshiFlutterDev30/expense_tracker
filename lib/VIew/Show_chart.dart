@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +14,7 @@ class _ShowChartState extends State<ShowChart> {
   List<expense> expenses = [];
   bool isLoading = true;
   double totalAmount = 0;
+
   @override
   void initState() {
     super.initState();
@@ -21,7 +23,10 @@ class _ShowChartState extends State<ShowChart> {
 
   Future<void> fetchExpenses() async {
     final QuerySnapshot<Map<String, dynamic>> snapshot =
-        await FirebaseFirestore.instance.collection('Expense').get();
+        await FirebaseFirestore.instance
+            .collection('Expense')
+            .where("Uid", isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+            .get();
     setState(() {
       expenses =
           snapshot.docs.map((doc) => expense.fromFirestore(doc)).toList();
@@ -36,10 +41,17 @@ class _ShowChartState extends State<ShowChart> {
     }
 
     Map<String, double> categoryData = {};
+    totalAmount = 0;
     for (var expense in expenses) {
+      double amount = double.parse(expense.Amount);
       categoryData[expense.Category] =
-          (categoryData[expense.Category] ?? 0) + double.parse(expense.Amount);
+          (categoryData[expense.Category] ?? 0) + amount;
+      totalAmount += amount;
     }
+
+    print('Total Amount: $totalAmount');
+    print('Category Data: $categoryData');
+
     const Map<String, Color> categoryColors = {
       'Housing': Colors.blue,
       'Transportation': Colors.green,
@@ -59,28 +71,24 @@ class _ShowChartState extends State<ShowChart> {
       'Billing': Colors.black,
     };
 
-    for (var expense in expenses) {
-      double amount = double.parse(expense.Amount);
-      categoryData[expense.Category] = (categoryData[expense.Category] ?? 0) + amount;
-      totalAmount += amount;
-    }
     List<PieChartSectionData> sections =
         categoryData.entries.map((entry) {
           double percentage = (entry.value / totalAmount) * 100;
           return PieChartSectionData(
+            radius: MediaQuery.of(context).size.width * 0.19,
             value: entry.value,
             title: '${entry.key}\n${percentage.toStringAsFixed(1)}%',
             color: categoryColors[entry.key] ?? Colors.grey,
             titleStyle: TextStyle(
               fontSize: 20,
               color: categoryTextColors[entry.key],
+              fontWeight: FontWeight.bold,
             ),
           );
         }).toList();
 
     return Scaffold(
       appBar: AppBar(title: Text('Expense Chart'), centerTitle: true),
-
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

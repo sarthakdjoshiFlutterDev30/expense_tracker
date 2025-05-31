@@ -12,6 +12,9 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   var email = TextEditingController();
   var password = TextEditingController();
+  bool isloading = false;
+  bool show = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +40,6 @@ class _LoginState extends State<Login> {
                     fontSize: 22,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.only(
@@ -53,10 +55,22 @@ class _LoginState extends State<Login> {
               TextField(
                 controller: password,
                 style: const TextStyle(fontSize: 20, color: Colors.white),
+
                 keyboardType: TextInputType.text,
-                obscureText: true,
+                obscureText: show,
                 obscuringCharacter: "*",
                 decoration: InputDecoration(
+                  suffixIcon: TextButton(
+                    onPressed: () {
+                      setState(() {
+                        show = !show;
+                      });
+                    },
+                    child: Text(
+                      (show) ? "Show" : "Hide",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                  ),
                   hintText: "Enter Password",
                   hintStyle: TextStyle(
                     fontSize: 22,
@@ -74,42 +88,48 @@ class _LoginState extends State<Login> {
                 ),
               ),
               SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  if (email.text.trim().isEmpty ||
-                      password.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          "Enter Email Or Password",
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        duration: Duration(seconds: 2),
+              (isloading)
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                    onPressed: () async {
+                      if (email.text.trim().isEmpty ||
+                          password.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Enter Email Or Password",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      } else {
+                        isloading = true;
+                        setState(() {});
+                        final lc = Firebase_Controller();
+                        if (await lc.signIn(
+                          email.text.trim().toString(),
+                          password.text.trim().toString(),
+                        )) {
+                          Navigator.pushReplacementNamed(context, "/home");
+                        } else {
+                          isloading = false;
+                          setState(() {});
+                          print("Not Navigate");
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
                       ),
-                    );
-                  } else {
-                    final lc = Firebase_Controller();
-                    if (await lc.signIn(
-                      email.text.trim().toString(),
-                      password.text.trim().toString(),
-                    )) {
-                      Navigator.pushReplacementNamed(context, "/home");
-                    } else {
-                      print("Not Navigate");
-                    }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
+                    ),
+                    child: Text(
+                      "Login",
+                      style: const TextStyle(fontSize: 20, color: Colors.white),
+                    ),
                   ),
-                ),
-                child: Text(
-                  "Login",
-                  style: const TextStyle(fontSize: 20, color: Colors.white),
-                ),
-              ),
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -124,6 +144,46 @@ class _LoginState extends State<Login> {
                     },
                     child: Text(
                       "Signup",
+                      style: TextStyle(fontSize: 20, color: Colors.blue),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Forgot Password?",
+                    style: TextStyle(fontSize: 20, color: Colors.white),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (email.text.trim().isNotEmpty) {
+                        Firebase_Controller.resetPassword(
+                          email.text.trim().toString(),
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Password Reset Email Sent",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Enter Email To Reset Password",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text(
+                      "Reset",
                       style: TextStyle(fontSize: 20, color: Colors.blue),
                     ),
                   ),
