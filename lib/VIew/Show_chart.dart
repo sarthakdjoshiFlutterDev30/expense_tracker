@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import '../Model/expenseChart.dart';
 
 class ShowChart extends StatefulWidget {
+  const ShowChart({super.key});
+
   @override
   _ShowChartState createState() => _ShowChartState();
 }
